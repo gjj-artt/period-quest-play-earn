@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Games from "./pages/Games";
+import Rewards from "./pages/Rewards";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -17,9 +19,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* We can add more routes as we develop the games */}
-          <Route path="/games" element={<NotFound />} />
-          <Route path="/rewards" element={<NotFound />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/about" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
