@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ShoppingBag, Heart, Search, Smile, Calendar, Gamepad, Trophy } from 'lucide-react';
+import { ShoppingBag, Heart, Search, Smile, Calendar, Gamepad, Trophy, Award } from 'lucide-react';
+import GameCard from '@/components/GameCard';
 
 // Define the user progress and rewards types
 interface GameProgress {
@@ -39,71 +40,6 @@ const Games = () => {
     return savedRewards ? JSON.parse(savedRewards) : { coins: 0, badges: [], tips: [] };
   });
 
-  // Function to play a game and update progress/rewards
-  const playGame = (gameId: string, gameName: string) => {
-    // Simulate completing a game with a random score
-    const score = Math.floor(Math.random() * 100) + 1;
-    const coinsEarned = Math.floor(score / 10) + 5;
-    
-    // Update progress
-    const gameIndex = userProgress.findIndex(game => game.gameId === gameId);
-    const updatedProgress = [...userProgress];
-    
-    if (gameIndex >= 0) {
-      updatedProgress[gameIndex] = {
-        ...updatedProgress[gameIndex],
-        score: Math.max(updatedProgress[gameIndex].score, score),
-        lastPlayed: new Date().toISOString(),
-        completed: true
-      };
-    } else {
-      updatedProgress.push({
-        gameId,
-        score,
-        completed: true,
-        lastPlayed: new Date().toISOString()
-      });
-    }
-    
-    // Update rewards
-    const updatedRewards = {
-      ...userRewards,
-      coins: userRewards.coins + coinsEarned
-    };
-    
-    // Add a badge if score is high enough and user doesn't already have it
-    if (score > 80) {
-      const badgeName = `${gameName} Master`;
-      if (!updatedRewards.badges.includes(badgeName)) {
-        updatedRewards.badges = [...updatedRewards.badges, badgeName];
-        
-        toast({
-          title: "New Badge Unlocked!",
-          description: `You've earned the "${badgeName}" badge!`,
-          duration: 5000,
-        });
-      }
-    }
-    
-    // Save to state and localStorage
-    setUserProgress(updatedProgress);
-    setUserRewards(updatedRewards);
-    localStorage.setItem('periodQuestProgress', JSON.stringify(updatedProgress));
-    localStorage.setItem('periodQuestRewards', JSON.stringify(updatedRewards));
-    
-    // Show toast notification
-    toast({
-      title: "Game Completed!",
-      description: `You scored ${score} points and earned ${coinsEarned} coins!`,
-      duration: 3000,
-    });
-  };
-
-  // Get progress for a specific game
-  const getGameProgress = (gameId: string) => {
-    return userProgress.find(game => game.gameId === gameId) || { gameId, completed: false, score: 0, lastPlayed: '' };
-  };
-  
   // Games data
   const games = [
     {
@@ -111,44 +47,85 @@ const Games = () => {
       name: "Period Product Match-Up",
       description: "Match period products (pads, tampons, cups) to their ideal use cases in this relaxing ASMR game.",
       icon: <ShoppingBag className="h-5 w-5" />,
-      color: "from-quest-pink to-quest-purple"
+      color: "from-quest-pink to-quest-purple",
+      rewards: [
+        "Confidence Coins",
+        "Period Pro Badge",
+        "Product Knowledge Tips"
+      ],
+      badgeName: "Period Pro"
     },
     {
       id: "myth-challenge",
       name: "Myth or Fact Challenge",
       description: "Test your knowledge about periods with a fun myth vs. fact trivia game with soothing sounds.",
       icon: <Search className="h-5 w-5" />,
-      color: "from-quest-purple to-quest-blue"
+      color: "from-quest-purple to-quest-blue",
+      rewards: [
+        "Confidence Coins",
+        "Myth Buster Badge",
+        "Exclusive Health Facts"
+      ],
+      badgeName: "Myth Buster"
     },
     {
       id: "care-adventure",
       name: "Period Care Adventure",
       description: "Navigate real-life period scenarios and make decisions for the best care options.",
       icon: <Heart className="h-5 w-5" />,
-      color: "from-quest-pink to-quest-purple"
+      color: "from-quest-pink to-quest-purple",
+      rewards: [
+        "Confidence Coins",
+        "Care Expert Badge",
+        "Self-Care Tips"
+      ],
+      badgeName: "Care Expert"
     },
     {
       id: "mood-tracker",
       name: "Mood Tracker Bingo",
       description: "Log your mood and symptoms in a bingo-style mood tracker.",
       icon: <Smile className="h-5 w-5" />,
-      color: "from-quest-lightPink to-quest-pink"
+      color: "from-quest-lightPink to-quest-pink",
+      rewards: [
+        "Confidence Coins",
+        "Cycle Champion Badge",
+        "Digital Stickers"
+      ],
+      badgeName: "Cycle Champion"
     },
     {
       id: "preparedness",
       name: "Period Preparedness Quiz",
       description: "Pack the ultimate emergency period kit in this timed game.",
       icon: <ShoppingBag className="h-5 w-5" />,
-      color: "from-quest-lightPurple to-quest-purple"
+      color: "from-quest-lightPurple to-quest-purple",
+      rewards: [
+        "Confidence Coins",
+        "Period Planner Badge",
+        "Emergency Checklist"
+      ],
+      badgeName: "Period Planner"
     },
     {
       id: "cycle-simulator",
       name: "Super Cycle Simulator",
       description: "Manage your period, energy, cravings, and tasks in this fun simulation.",
       icon: <Calendar className="h-5 w-5" />,
-      color: "from-blue-400 to-blue-600"
+      color: "from-blue-400 to-blue-600",
+      rewards: [
+        "Confidence Coins",
+        "Cycle Guru Badge",
+        "Relaxation Playlist"
+      ],
+      badgeName: "Cycle Guru"
     }
   ];
+
+  // Get progress for a specific game
+  const getGameProgress = (gameId: string) => {
+    return userProgress.find(game => game.gameId === gameId) || { gameId, completed: false, score: 0, lastPlayed: '' };
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -173,43 +150,18 @@ const Games = () => {
                 
                 <TabsContent value="all-games" className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {games.map((game) => {
-                      const progress = getGameProgress(game.id);
-                      return (
-                        <Card key={game.id} className="overflow-hidden hover:shadow-lg transition duration-300 border-2 h-full flex flex-col">
-                          <div className={`bg-gradient-to-r ${game.color} h-2`}></div>
-                          <CardHeader className="pb-2">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-full bg-quest-lightPurple text-quest-purple">
-                                {game.icon}
-                              </div>
-                              <CardTitle className="text-lg font-bold">{game.name}</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pb-2 flex-grow">
-                            <CardDescription className="mb-4">{game.description}</CardDescription>
-                            
-                            {progress.completed && (
-                              <div className="mb-2">
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>Best Score:</span>
-                                  <span className="font-medium">{progress.score}/100</span>
-                                </div>
-                                <Progress value={progress.score} className="h-2" />
-                              </div>
-                            )}
-                          </CardContent>
-                          <CardFooter>
-                            <Button 
-                              onClick={() => playGame(game.id, game.name)}
-                              className="w-full bg-gradient-quest hover:opacity-90 transition"
-                            >
-                              {progress.completed ? 'Play Again' : 'Play Now'}
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      );
-                    })}
+                    {games.map((game) => (
+                      <GameCard
+                        key={game.id}
+                        id={game.id}
+                        title={game.name}
+                        description={game.description}
+                        icon={game.icon}
+                        rewards={game.rewards}
+                        badgeName={game.badgeName}
+                        color={game.color}
+                      />
+                    ))}
                   </div>
                 </TabsContent>
                 
@@ -244,7 +196,7 @@ const Games = () => {
                           </CardContent>
                           <CardFooter>
                             <Button 
-                              onClick={() => playGame(game.id, game.name)}
+                              onClick={() => navigate(`/game/${game.id}`)}
                               className="w-full bg-gradient-quest hover:opacity-90 transition"
                             >
                               Play Again
@@ -261,7 +213,7 @@ const Games = () => {
                         </div>
                         <h3 className="text-xl font-bold mb-2">No Completed Games Yet</h3>
                         <p className="text-gray-500 mb-4">Play some games to see your progress here!</p>
-                        <Button onClick={() => document.querySelector('[value="all-games"]')?.click()}>
+                        <Button onClick={() => document.querySelector('[value="all-games"]')?.dispatchEvent(new Event('click'))}>
                           Browse All Games
                         </Button>
                       </div>
@@ -271,37 +223,18 @@ const Games = () => {
                 
                 <TabsContent value="popular">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {games.slice(0, 3).map((game) => {
-                      const progress = getGameProgress(game.id);
-                      return (
-                        <Card key={game.id} className="overflow-hidden hover:shadow-lg transition duration-300 border-2">
-                          <div className={`bg-gradient-to-r ${game.color} h-2`}></div>
-                          <CardHeader className="pb-2">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-full bg-quest-lightPurple text-quest-purple">
-                                {game.icon}
-                              </div>
-                              <CardTitle className="text-lg font-bold">{game.name}</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pb-2">
-                            <CardDescription className="mb-4">{game.description}</CardDescription>
-                            <div className="flex items-center gap-2 text-sm text-quest-purple">
-                              <Trophy size={16} />
-                              <span>Popular choice!</span>
-                            </div>
-                          </CardContent>
-                          <CardFooter>
-                            <Button 
-                              onClick={() => playGame(game.id, game.name)}
-                              className="w-full bg-gradient-quest hover:opacity-90 transition"
-                            >
-                              {progress.completed ? 'Play Again' : 'Play Now'}
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      );
-                    })}
+                    {games.slice(0, 3).map((game) => (
+                      <GameCard
+                        key={game.id}
+                        id={game.id}
+                        title={game.name}
+                        description={game.description}
+                        icon={game.icon}
+                        rewards={game.rewards}
+                        badgeName={game.badgeName}
+                        color={game.color}
+                      />
+                    ))}
                   </div>
                 </TabsContent>
               </Tabs>

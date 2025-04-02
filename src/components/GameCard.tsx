@@ -1,10 +1,12 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trophy, Award } from 'lucide-react';
 
 interface GameCardProps {
+  id: string;
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -13,7 +15,13 @@ interface GameCardProps {
   color?: string;
 }
 
-const GameCard = ({ title, description, icon, rewards, badgeName, color = "from-quest-pink to-quest-purple" }: GameCardProps) => {
+const GameCard = ({ id, title, description, icon, rewards, badgeName, color = "from-quest-pink to-quest-purple" }: GameCardProps) => {
+  const navigate = useNavigate();
+  
+  const handlePlayNow = () => {
+    navigate(`/game/${id}`);
+  };
+  
   return (
     <Card className="overflow-hidden hover:shadow-lg transition duration-300 border-2 h-full flex flex-col">
       <div className={`bg-gradient-to-r ${color} h-2`}></div>
@@ -49,7 +57,12 @@ const GameCard = ({ title, description, icon, rewards, badgeName, color = "from-
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full bg-gradient-quest hover:opacity-90 transition">Play Now</Button>
+        <Button 
+          onClick={handlePlayNow} 
+          className="w-full bg-gradient-quest hover:opacity-90 transition"
+        >
+          Play Now
+        </Button>
       </CardFooter>
     </Card>
   );
